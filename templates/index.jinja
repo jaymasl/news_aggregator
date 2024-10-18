@@ -1,0 +1,84 @@
+{% extends 'base.jinja' %}
+{% block content %}
+    <div class="articles" id="article-container">
+        {% for article in articles %}
+            <article>
+                <h2><a href="{{ article[1].link }}">{{ article[1].title }}</a></h2>
+                <p>{{ article[1].published }} UTC</p>
+                <p>Source: {{ article[0] }}</p>
+                <p>Summary: {{ article[1].text_clip | safe }}</p>
+            </article>
+        {% endfor %}
+    </div>
+    <div id="loading" style="display:none; text-align:center; font-size:1.5em; font-weight:bold; padding:20px;">
+        Loading...
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let page = 1;
+            let isLoading = false;
+            const articleContainer = document.getElementById('article-container');
+            const loadingIndicator = document.getElementById('loading');
+            const sourceSelect = document.getElementById('source-select');
+
+            function loadMoreArticles() {
+                if (isLoading) return;
+                isLoading = true;
+                loadingIndicator.style.display = 'block';
+
+                const selectedSource = sourceSelect ? sourceSelect.value : '';
+                const url = `/load_more?page=${page + 1}&source=${selectedSource}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load more articles');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        if (html.trim()) {
+                            articleContainer.insertAdjacentHTML('beforeend', html);
+                            page += 1;
+                        } else {
+                            window.removeEventListener('scroll', scrollHandler);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error loading more articles:', error);
+                    })
+                    .finally(() => {
+                        isLoading = false;
+                        loadingIndicator.style.display = 'none';
+                    });
+            }
+
+            function scrollHandler() {
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+
+                if (windowHeight + scrollTop >= documentHeight - 100 && !isLoading) {
+                    loadMoreArticles();
+                }
+            }
+
+            window.addEventListener('scroll', scrollHandler);
+
+            if (sourceSelect) {
+                sourceSelect.addEventListener('change', function() {
+                    const selectedSource = this.value;
+                    const currentUrl = new URL(window.location.href);
+                    
+                    if (selectedSource) {
+                        currentUrl.searchParams.set('source', selectedSource);
+                    } else {
+                        currentUrl.searchParams.delete('source');
+                    }
+                    
+                    window.location.href = currentUrl.toString();
+                });
+            }
+        });
+    </script>
+{% endblock %}

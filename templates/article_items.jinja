@@ -1,0 +1,8 @@
+{% for article in articles %}
+    <article>
+        <h2><a href="{{ article[1].link }}">{{ article[1].title }}</a></h2>
+        <p>{{ article[1].published }} UTC</p>
+        <p>Source: {{ article[0] }}</p>
+        <p>Summary: {{ article[1].text_clip | safe }}</p>
+    </article>
+{% endfor %}

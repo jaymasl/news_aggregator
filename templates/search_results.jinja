@@ -1,0 +1,15 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+    <h2 class="custom-search">Search Results For: "{{ query }}"</h2>
+    <div class="articles">
+        {% for article in articles %}
+            <article>
+                <h2><a href="{{ article[1].link }}">{{ article[1].title }}</a></h2>
+                <p>{{ article[1].published }}</p>
+                <p><span class="bold">Source:</span> {{ article[0] }}</p>
+                <p><span class="bold">Summary:</span> {{ article[1].text_clip }}</p>
+            </article>
+        {% endfor %}
+    </div>
+{% endblock %}

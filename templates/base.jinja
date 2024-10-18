@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Aggregator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>News Aggregator</h1>
+        <a href="https://jaykrown.com">jaykrown.com</a>
+        <form action="{{ url_for('search') }}" method="get">
+            <input type="text" name="q" placeholder="Search articles...">
+            <button type="submit">Search</button>
+        </form>
+        <div class="source-filter">
+            <label for="source-select">Filter by News Source:</label>
+            <select id="source-select" name="source">
+                <option value="">All Sources</option>
+                {% for source in sources %}
+                    <option value="{{ source }}"{% if source == selected_source %} selected{% endif %}>{{ source }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </header>    
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
